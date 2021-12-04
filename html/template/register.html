@@ -1,0 +1,17 @@
+{{ define "register" }}
+    <!doctype html>
+    <html lang="en">
+
+    {{ template "header"}}
+    <main>
+
+        <form action="album">
+            <input type="email">
+            <input type="password">
+            <input type="text" placeholder="Проверочный код">
+            <input type="submit" value="Зарегистрироваться">
+        </form>
+    </main>
+    {{ template "footer"}}
+    </html>
+{{ end }}
