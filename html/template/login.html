@@ -1,4 +1,4 @@
-{{ define "register" }}
+{{ define "login" }}
     <!doctype html>
     <html lang="en">
 
@@ -10,27 +10,20 @@
                 var obj = {};
                 obj.name = $("#name_f").val();
                 obj.password = $("#password_f").val();
-                obj.code_word = $("#code_word_f").val();
                     $.ajax({
-                        url: 'register',
+                        url: '',
                         type : "post",
                         contentType: "application/json",
                         dataType : 'json',
                         data : JSON.stringify(obj),//$("form").serialize(), // post data || get data
-                        success : function(response) {
-                            // if (data.ok)
-                            // if (data.redirect) {
-                                // data.redirect contains the string URL to redirect to
-                                location.href = "/";
-                            // } else {
-                            //     // data.form contains the HTML for the replacement form
-                            //     document.querySelector("#answer-div").innerHTML = data
-                            // }
+                        success : function(result) {
+                            document.querySelector("#answer-div").innerHTML = result
                         },
                         error: function(xhr, resp, text) {
                             document.querySelector("#answer-div").innerHTML = resp
                         }
                     })
+                    return;
             };
             document.addEventListener('DOMContentLoaded', function () {
                 document.querySelector('#submitButton').addEventListener('click', submit);
@@ -39,7 +32,6 @@
         <form>
            <p>   <input type="text" id="name_f" name="name"> </p>
             <p>  <input type="password" id="password_f" name="password"> </p>
-            <p>  <input type="password" id="code_word_f"name="code_word" placeholder="Проверочный код"> </p>
             <p> <button class="check-button" id="submitButton" type="submit">Зарегистрироваться</button></p>
         </form>
             <div id="answer-div"> </div>

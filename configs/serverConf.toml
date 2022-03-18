@@ -3,3 +3,9 @@ log_level = "debug"
 auth_file = "users.json"
 session_key = "[session_key]"
 new_user_key = "[new_user_key]"
+
+
+gpio_x = 17
+gpio_y = 37
+inverse_x = true
+inverse_y = false
