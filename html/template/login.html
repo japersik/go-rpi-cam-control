@@ -3,7 +3,7 @@
     <html lang="en">
 
     {{ template "header"}}
-    <div class="content" id="content">
+    <div class="content content-col content-col-1" id="content">
         <script>
             const submit = function (e) {
                 e.preventDefault();
@@ -18,6 +18,10 @@
                         data : JSON.stringify(obj),//$("form").serialize(), // post data || get data
                         success : function(result) {
                             document.querySelector("#answer-div").innerHTML = result
+                            setTimeout(function(){
+                                location.href = "/";
+                            }, 500);
+
                         },
                         error: function(xhr, resp, text) {
                             document.querySelector("#answer-div").innerHTML = resp
@@ -29,13 +33,15 @@
                 document.querySelector('#submitButton').addEventListener('click', submit);
             })
         </script>
-        <form>
-           <p>   <input type="text" id="name_f" name="name"> </p>
-            <p>  <input type="password" id="password_f" name="password"> </p>
-            <p> <button class="check-button" id="submitButton" type="submit">Зарегистрироваться</button></p>
+        <div>
+        <form >
+           <p>   <input type="text" id="name_f" name="name" placeholder="Login"> </p>
+            <p>  <input type="password" id="password_f" name="password" placeholder="Password"> </p>
+            <p> <button class="btn btn-primary" id="submitButton" type="submit">Sign in</button></p>
         </form>
-            <div id="answer-div"> </div>
-        <div class="content" id="content">
+        </div>
+        <div class="centered" id="answer-div"> </div>
+            </div>
     {{ template "footer"}}
     </html>
 {{ end }}

@@ -7,12 +7,55 @@
         {{/*        <link href="img/favicon.ico" rel="shortcut icon" type="image/x-icon">*/}}
         <link href="/static/css/style.css" rel="stylesheet">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript"
+                src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+        <script>
+
+
+            function headerPanel() {
+                var value = $.cookie("SessionCookie");
+                console.log(value)
+                if (value === undefined) {
+                    document.querySelector("#header-btn-box").innerHTML = `<div class="header-btn-box">
+                        <a href="/login" class="btn btn-primary">Sign in</a>
+                        <a href="/register" class="btn btn-secondary">Sign up</a>
+                    </div>`
+                }
+                else {
+                    document.querySelector("#header-btn-box").innerHTML =
+                        `<p> <a href="/private/" class="btn btn-primary">Album</a></p>
+                         <button id="logout" class="btn btn-secondary" onclick="logout()">Log out</button>`
+                }
+            }
+            function logout() {
+                console.log(123123)
+                $.ajax({
+                    url: '/logout',
+                    type : "post",
+                    contentType: "application/json",
+                    dataType : 'json',
+                   success : function(response) {
+                        location.href = "/";
+                    },
+                    error: function(xhr, resp, text) {
+                        // document.querySelector("#answer-div").innerHTML = resp
+                    }
+                })
+            }
+
+            window.onload = function() {
+                headerPanel();
+            };
+
+        </script>
         <title>Rpi Cam Control</title>
     </head>
     <body>
     <div class="wrapper">
         <div class="header">
-            <span><a href="/">RpiCam</a></span>
-            <span class="student-info">Место для кнопок</span>
+            <div class="header-text"><a href="/">RpiCam</a></div>
+            <div id="header-btn-box" class="header-btn-box">
+            </div>
+
         </div>
 {{end}}

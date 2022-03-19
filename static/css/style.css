@@ -13,11 +13,28 @@ body
 }
 
 .header {
+    display: flex;
     font-family: "Andale Mono", sans-serif;
+    justify-content: space-between;
     font-size: 30px;
     color: white;
     padding: 10px;
     background-color: #3c3f41;
+}
+.header-text{
+    text-align: center;
+    margin:  auto auto auto 20px;
+}
+.header-btn-box {
+    display: flex;
+    font-family: "Andale Mono", sans-serif;
+    justify-content: space-between;
+    font-size: 20px;
+    color: white;
+    padding: 10px;
+    background-color: #3c3f41;
+}
+.header>div{
 }
 body {
     font-family: "Andale Mono", sans-serif;
@@ -26,6 +43,27 @@ body {
 * {
     margin: 0;
     padding: 0;
+}
+form{
+    text-align: center;
+    background: #d7d7d7;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 15px;
+}
+.form-middle{
+
+}
+form>*>*{
+    font-family: "Andale Mono", sans-serif;
+    font-size: 15px;
+}
+form>p>input{
+
+    background: #efefef;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
 }
 .wrapper {
     display: flex;
@@ -161,23 +199,6 @@ a{color: white;
     max-width: 400px;
     max-height: 400px;
 }
-/*}*/
-/*.img-form {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*    margin: 0 auto;*/
-/*}*/
-
-/*.is-valid {*/
-/*    border-color: green;*/
-/*    border-width: 2px;*/
-/*    border-style: solid;*/
-/*}*/
-
-/*.is-invalid {*/
-/*    border-color: red;*/
-/*}*/
-
 
 .centered {
     text-align: center;
@@ -186,166 +207,3 @@ a{color: white;
 .centered>* {
     margin: 5px auto;
 }
-
-/*.student-info {*/
-/*    float: right*/
-/*}*/
-
-
-/*body {*/
-/*    margin: 0 auto;*/
-/*    border: 0;*/
-/*    font-family: "Andale Mono", monospace;*/
-/*    overflow-x: hidden;*/
-
-/*}*/
-
-/*.areas-img {*/
-/*    position: relative;*/
-/*}*/
-
-/*.areas-img>img {*/
-/*    height: 200px;*/
-/*    width: 200px;*/
-/*}*/
-
-/*.form-input {*/
-/*    margin: 1%;*/
-
-/*}*/
-
-/*.form-input-y {*/
-/*    margin: 0.5%;*/
-/*}*/
-
-/*.form-input-x {*/
-/*    margin: 0.5%;*/
-/*}*/
-
-/*.data-send-form {*/
-/*    min-width: 240px;*/
-/*    max-width: 240px;*/
-/*    float: right;*/
-/*    margin: 0 auto;*/
-/*}*/
-
-/*.form-input {*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*}*/
-
-/*.radio-buttons {*/
-/*    display: flex;*/
-/*    flex-direction: row;*/
-/*}*/
-
-/*.check-button {*/
-/*    background-color: #565558;*/
-/*    border: 1px solid #5f5864;*/
-/*    margin: 2%;*/
-
-/*}*/
-
-/*.check-button:hover {*/
-/*    background-color: #8e2b97;*/
-/*}*/
-
-/*.radio-buttons>p {*/
-/*    padding: 0 2px;*/
-/*}*/
-
-/*.radio-input,*/
-/*.radio-label {*/
-/*    display: block;*/
-/*}*/
-
-/*.clear-button {*/
-/*    background-color: #ff343b;*/
-/*    border: 1px solid #88161a;*/
-/*}*/
-
-/*.clear-button:hover {*/
-/*    background-color: rgb(0, 0, 0);*/
-/*}*/
-
-
-
-/*.form-buttons {*/
-/*    margin: 3%*/
-/*}*/
-
-
-
-/*@media (min-width:100px) {*/
-/*    .content {*/
-/*        flex-direction: column;*/
-/*        text-align: center;*/
-/*    }*/
-
-/*    .img-form {*/
-/*        display: flex;*/
-/*        flex-direction: column;*/
-/*        margin: 0 auto;*/
-/*    }*/
-
-/*    .table-wrapper {*/
-/*        margin: 0 auto;*/
-/*        text-align: center;*/
-/*        overflow-x: scroll;*/
-/*    }*/
-
-/*    .table {*/
-/*        overflow-x: auto;*/
-/*        width: 100vw;*/
-/*    }*/
-
-/*    .table-header {*/
-/*        overflow-x: auto*/
-/*    }*/
-/*}*/
-
-/*@media (min-width:440px) {*/
-/*    .content {*/
-/*        flex-direction: column;*/
-/*        text-align: center;*/
-/*    }*/
-
-/*    .img-form {*/
-/*        display: flex;*/
-/*        flex-direction: row;*/
-/*        margin: 0 auto;*/
-/*    }*/
-
-/*    .table-wrapper {*/
-/*        margin: 0 auto;*/
-/*        text-align: center;*/
-/*        overflow-x: auto;*/
-/*    }*/
-
-/*    .table {*/
-/*        margin-top: 3%;*/
-/*        width: 100vw;*/
-/*        overflow-x: auto;*/
-/*    }*/
-
-/*    .table-header {*/
-/*        overflow-x: auto;*/
-/*    }*/
-/*}*/
-
-/*@media (min-width:1150px) {*/
-/*    .content {*/
-/*        flex-direction: row;*/
-/*    }*/
-
-/*    .table {*/
-/*        margin-top: 0;*/
-/*        width: 100%;*/
-/*    }*/
-
-/*    .data-send-form {*/
-/*        min-width: 240px;*/
-/*        max-width: 240px;*/
-/*        margin: 0;*/
-/*    }*/
-/*}*/

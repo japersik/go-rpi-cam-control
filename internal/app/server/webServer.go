@@ -136,6 +136,9 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 		}
 		uname, ok := session.Values["user_name"]
 		if !ok {
+			fmt.Println(12311111123123)
+			session.Options.MaxAge = 3
+			err = s.sessionStore.Save(r, w, session)
 			//s.error(w, r, http.StatusUnauthorized, errNotAuthenticated)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return
