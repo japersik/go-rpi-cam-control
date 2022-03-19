@@ -24,11 +24,10 @@
                 else {
                     document.querySelector("#header-btn-box").innerHTML =
                         `<p> <a href="/private/" class="btn btn-primary">Album</a></p>
-                         <button id="logout" class="btn btn-secondary" onclick="logout()">Log out</button>`
+                         <p id="logout" class="btn btn-secondary" onclick="logout()">Log out</p>`
                 }
             }
             function logout() {
-                console.log(123123)
                 $.ajax({
                     url: '/logout',
                     type : "post",

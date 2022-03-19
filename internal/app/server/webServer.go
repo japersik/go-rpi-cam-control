@@ -88,8 +88,8 @@ func (s *server) configureRouter() {
 	private.Use(s.authenticateUser) //аутентификация
 	private.HandleFunc("/", s.handleAlbumHTML()).Methods("GET")
 	private.PathPrefix("/static/").Handler(http.StripPrefix("/private/static/", http.FileServer(http.Dir("./private/static/"))))
-	s.router.HandleFunc("/move_control", s.moveControl()).Methods("POST")
-	s.router.HandleFunc("/camera_control", s.cameraControl()).Methods("POST")
+	private.HandleFunc("/move_control", s.moveControl()).Methods("POST")
+	private.HandleFunc("/camera_control", s.cameraControl()).Methods("POST")
 	//private.HandleFunc("/control", s.handle())
 }
 
@@ -136,9 +136,9 @@ func (s *server) authenticateUser(next http.Handler) http.Handler {
 		}
 		uname, ok := session.Values["user_name"]
 		if !ok {
-			fmt.Println(12311111123123)
-			session.Options.MaxAge = 3
-			err = s.sessionStore.Save(r, w, session)
+			//fmt.Println(12311111123123)
+			//session.Options.MaxAge = 3
+			//err = s.sessionStore.Save(r, w, session)
 			//s.error(w, r, http.StatusUnauthorized, errNotAuthenticated)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 			return

@@ -2,20 +2,94 @@
     <!doctype html>
     <html lang="en" xmlns="http://www.w3.org/1999/html">
     {{ template "header"}}
+    <script>
+        function Up() {
+            var obj = {};
+            obj.direction = 'y'
+            obj.value = 3
+            $.ajax({
+                url: '/private/move_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    //print ok
+                },
+                error: function(xhr, resp, text) {
+                    //print Err
+                }
+            })
+        }
+        function Down() {
+            var obj = {};
+            obj.direction = 'y'
+            obj.value = -3
+            $.ajax({
+                url: '/private/move_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    // print ok
+                },
+                error: function(xhr, resp, text) {
+                    //print Err
+                }
+            })
+        }
+        function Left() {
+            var obj = {};
+            obj.direction = 'x'
+            obj.value = -3
+            $.ajax({
+                url: '/private/move_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    // print ok
+                },
+                error: function(xhr, resp, text) {
+                    //print Err
+                }
+            })
+        }
+        function Right() {
+            var obj = {};
+            obj.direction = 'x'
+            obj.value = 3
+            $.ajax({
+                url: '/private/move_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    // print ok
+                },
+                error: function(xhr, resp, text) {
+                    //print Err
+                }
+            })
+        }
+    </script>
     <div class="centered content content-col content-col-1" id="content">
         <div class="content content-rows content-rows-2" id="control_bar">
             <div class="content content-col content-col-1 btn-panel">
                 <p>Control</p>
                 <div class="content content-rows content-rows-1">
-                <div class="btn">Up</div>
+                <div class="btn" onclick="Up()">Up</div>
                 </div>
                 <div class="content content-rows content-rows-3">
-                    <div class="btn btn-panel">Left</div>
+                    <div class="btn btn-panel" onclick="Left()">Left</div>
                     <div class="btn btn-primary btn-panel">Photo</div>
-                    <div class="btn btn-panel">Right</div>
+                    <div class="btn btn-panel" onclick="Right()">Right</div>
                 </div>
                 <div class="content content-rows content-rows-1">
-                <div class="btn">Down</div>
+                <div class="btn" onclick="Down()">Down</div>
                 </div>
             </div>
 {{/*            <div class="content content-col content-col-1">*/}}
