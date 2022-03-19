@@ -2,7 +2,6 @@ package ServoController
 
 import (
 	"github.com/stianeikeland/go-rpio/v4"
-	"time"
 )
 
 //func main() {
@@ -58,8 +57,6 @@ func NewServoController(config *Config) (*GPIOServoController, error) {
 		servoX: newServo(uint8(config.GpioX), config.InverseX),
 		servoY: newServo(uint8(config.GpioY), config.InverseX),
 	}
-	tickChan := time.NewTicker(time.Microsecond * time.Duration(20000))
-	<-tickChan.C
 	return controller, nil
 }
 
