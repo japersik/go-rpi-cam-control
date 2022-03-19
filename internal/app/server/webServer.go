@@ -88,7 +88,7 @@ func (s *server) configureRouter() {
 	private.Use(s.authenticateUser) //аутентификация
 	private.HandleFunc("/", s.handleAlbumHTML()).Methods("GET")
 	private.PathPrefix("/static/").Handler(http.StripPrefix("/private/static/", http.FileServer(http.Dir("./private/static/"))))
-	s.router.HandleFunc("/move_control", s.logoutUser()).Methods("POST")
+	s.router.HandleFunc("/move_control", s.moveControl()).Methods("POST")
 	s.router.HandleFunc("/camera_control", s.cameraControl()).Methods("POST")
 	//private.HandleFunc("/control", s.handle())
 }

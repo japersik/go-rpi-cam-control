@@ -1,65 +1,77 @@
 {{ define "album" }}
-<!doctype html>
-<html lang="en">
-{{ template "header"}}
-<main>
-  <section class="py-5 text-center container">
-    <div class="row py-lg-5">
-      <div class="col-lg-6 col-md-8 mx-auto">
-        <h1 class="fw-light">RPi monitor</h1>
-        <p class="lead text-muted">Photo monitor for RaspberryPi</p>
-        <p>
-          <a href="#" class="btn btn-primary my-2">Control</a>
-          <a href="#" class="btn btn-secondary my-2">Take a photo</a>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <div class="album py-5 bg-light">
-    <div class="container">
-
-      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-        {{ range .}}
-          <div class="col">
-            <div class="card shadow-sm">
-              <img src="/private/static/img/{{.Name}}" alt="namee" width="100%" height="100%">
-              <div class="card-body">
-                <p class="card-text">File Name: {{.Name}}</p>
-                <p class="card-text">File Size: {{.Size}}B</p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                  </div>
-                  <small class="text-muted">{{.ModTime}}</small>
+    <!doctype html>
+    <html lang="en" xmlns="http://www.w3.org/1999/html">
+    {{ template "header"}}
+    <div class="centered content content-col content-col-1" id="content">
+        <div class="content content-rows content-rows-2" id="control_bar">
+            <div class="content content-col content-col-1 btn-panel">
+                <p>Control</p>
+                <div class="content content-rows content-rows-1">
+                <div class="btn">Up</div>
                 </div>
-              </div>
+                <div class="content content-rows content-rows-3">
+                    <div class="btn btn-panel">Left</div>
+                    <div class="btn btn-primary btn-panel">Photo</div>
+                    <div class="btn btn-panel">Right</div>
+                </div>
+                <div class="content content-rows content-rows-1">
+                <div class="btn">Down</div>
+                </div>
             </div>
-          </div>
-        {{end}}
-        <!--  <div class="col">/!-->
-        <div class="card shadow-sm">
-          <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+{{/*            <div class="content content-col content-col-1">*/}}
 
-          <div class="card-body">
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-            <div class="d-flex justify-content-between align-items-center">
-              <div class="btn-group">
-                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-              </div>
-              <small class="text-muted">9 mins</small>
-            </div>
-          </div>
+                  <div class="photo">
+                      <div class="centered">Last photo</div>
+                      <img  src="/private/static/img/img_1.png" alt="name" >
+                  </div>
+{{/*                </div>*/}}
+
         </div>
-      </div>
+        <div id="album" class="content content-rows content-rows-3">
+            <div class=" centered photo-box content-col">
+                <div class="photo">
+                    <img src="/private/static/img/img_1.png" alt="name">
+                </div>
+                <div class="centered photo-info"><p>info</p></div>
+                <div class="photo-box-buttons content content-rows content-rows-2">
+                    <div class="btn">Download</div>
+                    <div class="btn btn-secondary">Delete</div>
+                </div>
+            </div>
+            <div class="centered photo-box content-col">
+                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%"
+                                        height="100%">
+                </div>
+                <div>info</div>
+                <div class="content content-rows content-rows-2">
+                    <div class="btn">Download</div>
+                    <div class="btn btn-secondary">Delete</div>
+                </div>
+            </div>
+            <div class="centered photo-box content-col">
+                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%" height="100%">
+                </div>
+                <div>info</div>
+                <div class="content content-rows content-rows-2">
+                    <div class="btn">Download</div>
+                    <div class="btn btn-secondary">Delete</div>
+                </div>
+            </div>
+            <div class="centered photo-box content-col">
+                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%" height="100%">
+                </div>
+                <div>info</div>
+                <div class="content content-rows content-rows-2">
+                    <div class="btn">Download</div>
+                    <div class="btn btn-secondary">Delete</div>
+                </div>
+            </div>
+            <div class="photo-box"> Альбом</div>
+            {{/*    <div class="container">*/}}
+        </div>
+
 
     </div>
-  </div>
-  </div>
-
-</main>
-{{ template "footer"}}
-</html>
+    {{ template "footer"}}
+    </html>
 {{ end }}
