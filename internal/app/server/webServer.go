@@ -47,7 +47,7 @@ func newServer(config *Config, mover moveController.Mover, camera cameraControll
 		sessionStore: sessionStore,
 		mover:        mover,
 		camera:       camera,
-		userStore:    newUserStore(config.AuthFile),
+		userStore:    newUserStore(config.AuthFile, config.NewUserKey),
 	}
 	s.configureRouter()
 	encoderCfg := zap.NewProductionEncoderConfig()
@@ -167,11 +167,11 @@ func (s *server) handleCreateUser() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		if req.UserCreationCodeWord != "passcode" || s.userStore.checkUserExist(req.Name) {
+		if s.userStore.checkUserExist(req.Name) {
 			s.error(w, r, http.StatusUnprocessableEntity, errors.New("user exist or wrong passcode"))
 			return
 		}
-		err := s.userStore.CreateUser(req.Name, req.Password)
+		err := s.userStore.CreateUser(req.Name, req.Password, req.UserCreationCodeWord)
 		if err != nil {
 			s.error(w, r, http.StatusUnprocessableEntity, errors.New("user exist or wrong passcode"))
 			return

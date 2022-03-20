@@ -2,19 +2,22 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func newUserStore(userFile string) userStore {
+func newUserStore(userFile, passcode string) userStore {
 	return userStore{
 		userFile:     userFile,
 		userPassword: map[string][]byte{},
+		passcode:     passcode,
 	}
 }
 
 type userStore struct {
 	userFile     string
 	userPassword map[string][]byte
+	passcode     string
 }
 
 func (u userStore) checkUserExist(username string) bool {
@@ -22,7 +25,11 @@ func (u userStore) checkUserExist(username string) bool {
 	return ok
 }
 
-func (u *userStore) CreateUser(username, password string) error {
+func (u *userStore) CreateUser(username, password string, passcode string) error {
+	fmt.Println(passcode, u.passcode)
+	if u.passcode != passcode {
+		return errors.New("Wrong passcode")
+	}
 	if u.checkUserExist(username) {
 		return errors.New("User exists")
 	}
@@ -52,18 +59,3 @@ func getHashingCost(hashedPassword []byte) int {
 	cost, _ := bcrypt.Cost(hashedPassword) // Игнорировать обработку ошибок для простоты
 	return cost
 }
-
-//func PassWordHashingHandler(w http.ResponseWriter, r *http.Request) {
-//	password := "secret"
-//	hash, _ := HashPassword(password) // Для простоты игнорировать обработку ошибок
-//
-//	fmt.Fprintln(w, "Password:", password)
-//	fmt.Fprintln(w, "Hash:    ", hash)
-//
-//	match := CheckPasswordHash(password, hash)
-//	fmt.Fprintln(w, "Match:   ", match)
-//
-//	cost := GetHashingCost([]byte(hash))
-//	fmt.Fprintln(w, "Cost:    ", cost)
-//
-//}

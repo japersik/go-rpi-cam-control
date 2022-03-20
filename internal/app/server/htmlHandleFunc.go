@@ -11,7 +11,7 @@ func (s *server) handleAlbumHTML() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//files, _ := ioutil.ReadDir("private/static/img/")
-		files, _ := s.camera.GetPhotoNames(10, 1)
+		files, _ := s.camera.GetPhotoNames(12, 1)
 		fmt.Println(files)
 		t, err := template.ParseFiles("html/template/album.html", "html/template/header.html", "html/template/footer.html")
 		if err != nil {
