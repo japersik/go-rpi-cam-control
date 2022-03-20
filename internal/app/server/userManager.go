@@ -1,15 +1,26 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+	"os"
 )
 
 func newUserStore(userFile, passcode string) userStore {
+	users := map[string][]byte{}
+	jsonFile, err := os.OpenFile(userFile, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println("Open userFile error")
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	err = json.Unmarshal(byteValue, &users)
 	return userStore{
 		userFile:     userFile,
-		userPassword: map[string][]byte{},
+		userPassword: users,
 		passcode:     passcode,
 	}
 }
@@ -41,6 +52,7 @@ func (u *userStore) CreateUser(username, password string, passcode string) error
 		return err
 	}
 	u.userPassword[username] = hPass
+	u.save()
 	return nil
 }
 
@@ -58,4 +70,14 @@ func (u *userStore) CheckUser(username, password string) bool {
 func getHashingCost(hashedPassword []byte) int {
 	cost, _ := bcrypt.Cost(hashedPassword) // Игнорировать обработку ошибок для простоты
 	return cost
+}
+func (u userStore) save() error {
+	jsonFile, err := os.OpenFile(u.userFile, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer jsonFile.Close()
+	bytes, _ := json.Marshal(&u.userPassword)
+	_, err = jsonFile.Write(bytes)
+	return nil
 }
