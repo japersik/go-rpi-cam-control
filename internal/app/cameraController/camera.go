@@ -1,11 +1,9 @@
 package cameraController
 
-import "io/fs"
-
 type Camera interface {
-	TakePhoto() (id int, err error)
+	TakePhoto() (info PhotoInfo, err error)
 	DelPhoto(id int) error
-	GetPhoto(id int) (fs.FileInfo, error)
+	GetPhoto(id int) (PhotoInfo, error)
 	GetPhotoNums() int
-	GetPhotoNames(count, pageNumber int) ([]fs.FileInfo, error)
+	GetPhotoNames(count, pageNumber int) ([]PhotoInfo, error)
 }

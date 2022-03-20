@@ -245,13 +245,19 @@ func (s *server) cameraControl() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
-		fmt.Println(req)
 		switch req.CommandName {
 		case "take_photo":
-			s.camera.TakePhoto()
+			ph, _ := s.camera.TakePhoto()
+			s.respond(w, r, http.StatusOK, ph)
+			return
 		case "del_photo":
 			s.camera.DelPhoto(req.id)
+		case "get_photo":
+			ph, _ := s.camera.GetPhoto(req.id)
+			s.respond(w, r, http.StatusOK, ph)
+			return
 		}
+
 		s.respond(w, r, http.StatusOK, "Ok")
 	}
 }

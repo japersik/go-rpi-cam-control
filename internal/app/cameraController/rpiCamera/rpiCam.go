@@ -3,7 +3,7 @@ package rpiCamera
 import (
 	"errors"
 	"fmt"
-	"io/fs"
+	"github.com/japersik/go-rpi-cam-control/internal/app/cameraController"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -13,66 +13,58 @@ import (
 )
 
 type rpiCam struct {
-	photoDir  string
-	idToPath  map[int]fs.FileInfo
-	idCounter int
+	photoDir string
+	photos   []cameraController.PhotoInfo
 }
 
 func NewRpiCam(conf *Config) *rpiCam {
 	path := "private/static/img"
-	var mapa map[int]fs.FileInfo
+	var phArr []cameraController.PhotoInfo
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		fmt.Println(err)
 	}
 	if files != nil {
-		mapa = make(map[int]fs.FileInfo, len(files))
+		phArr = make([]cameraController.PhotoInfo, 0, len(files))
 		for i := 0; i < len(files); i++ {
 			if strings.HasSuffix(files[i].Name(), ".jpeg") {
-				mapa[len(mapa)+1] = files[i]
-				fmt.Println(files[i].Name())
+				phArr = append(phArr, cameraController.PhotoInfo{Name: files[i].Name(), Size: files[i].Size(), CreationTime: files[i].ModTime()})
 			}
 		}
 	} else {
-		mapa = make(map[int]fs.FileInfo, 20)
+		phArr = make([]cameraController.PhotoInfo, 0, 40)
 	}
 	cam := &rpiCam{
 		photoDir: path,
-		idToPath: mapa,
+		photos:   phArr,
 	}
-	cam.idCounter = len(mapa)
 	return cam
 }
 
-func (r *rpiCam) TakePhoto() (int, error) {
+func (r *rpiCam) TakePhoto() (cameraController.PhotoInfo, error) {
 	t := time.Now()
-	name := r.photoDir + t.Format("/2006-01-02150405") + strconv.Itoa(r.idCounter+1) + ".jpeg"
+	name := r.photoDir + t.Format("/2006-01-02-150405") + strconv.Itoa(len(r.photos)+1) + ".jpeg"
 	_, err := cmdGetPhoto(name)
 	if err != nil {
-		return 0, err
+		return cameraController.PhotoInfo{}, err
 	}
 	fs, err := os.Stat(name)
-	fmt.Println(fs)
-	fmt.Println(err)
 	if err != nil {
-		return 0, err
+		return cameraController.PhotoInfo{}, err
 	}
-	fmt.Println(fs)
-	r.idCounter++
-	r.idToPath[r.idCounter] = fs
+	r.photos = append(r.photos, cameraController.PhotoInfo{Name: fs.Name(), Size: fs.Size(), CreationTime: fs.ModTime()})
 
-	return r.idCounter, nil
+	return r.photos[len(r.photos)-1], nil
 }
 func (r *rpiCam) DelPhoto(id int) (err error) {
 	fmt.Println("delPhoto", id)
-
 	return nil
 }
-func (r *rpiCam) GetPhoto(id int) (fs.FileInfo, error) {
-	if name, ok := r.idToPath[id]; ok {
-		return name, nil
+func (r *rpiCam) GetPhoto(id int) (cameraController.PhotoInfo, error) {
+	if len(r.photos) < id {
+		return r.photos[id], nil
 	}
-	return nil, errors.New("id not found")
+	return cameraController.PhotoInfo{}, errors.New("id not found")
 }
 
 func cmdGetPhoto(name string) ([]byte, error) {
@@ -88,24 +80,22 @@ func cmdGetPhoto(name string) ([]byte, error) {
 	return cmd.Output()
 }
 func (r *rpiCam) GetPhotoNums() int {
-	return len(r.idToPath)
+	return len(r.photos) - 1
 }
-func (r *rpiCam) GetPhotoNames(count, pageNumber int) ([]fs.FileInfo, error) {
+func (r *rpiCam) GetPhotoNames(count, pageNumber int) ([]cameraController.PhotoInfo, error) {
 	if count*(pageNumber-1) > r.GetPhotoNums() {
 		return nil, errors.New("Maximum page: " + strconv.Itoa(r.GetPhotoNums()))
 	}
-	names := make([]fs.FileInfo, 0, count)
-	counter := 0
-	fmt.Println(r.idToPath)
-	for _, s := range r.idToPath {
-		counter++
-		if counter < (count * (pageNumber - 1)) {
-			continue
-		}
-		if counter > (count * (pageNumber + 1)) {
-			break
-		}
-		names = append(names, s)
+	names := make([]cameraController.PhotoInfo, 0, count)
+	left := len(r.photos) - (pageNumber-1)*count - 1
+	right := left - count
+	if right < 0 {
+		right = 0
+	}
+	fmt.Println(right, left)
+	for ; left > right; left-- {
+		r.photos[left].Id = left
+		names = append(names, r.photos[left])
 	}
 	return names, nil
 }

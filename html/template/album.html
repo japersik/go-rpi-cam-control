@@ -75,6 +75,26 @@
                 }
             })
         }
+        function TakePhoto() {
+            var obj = {};
+            obj.command_name = 'take_photo'
+            $.ajax({
+                url: '/private/camera_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    console.log(response)
+                    document.querySelector("#last-photo-name").innerHTML = '<b>Last photo</b>: ' +response['name']
+                    document.querySelector("#last-photo-img").setAttribute('src','/private/static/img/' +response['name'])
+                },
+                error: function(xhr, resp, text) {
+                    document.querySelector("#last-photo-name").innerHTML = 'Last photo getting <b>error<b>'
+                    document.querySelector("#last-photo-img").setAttribute('src','/private/static/img/img_1.png')
+                }
+            })
+        }
     </script>
     <div class="centered content content-col content-col-1" id="content">
         <div class="content content-rows content-rows-2" id="control_bar">
@@ -85,7 +105,7 @@
                 </div>
                 <div class="content content-rows content-rows-3">
                     <div class="btn btn-panel" onclick="Left()">Left</div>
-                    <div class="btn btn-primary btn-panel">Photo</div>
+                    <div class="btn btn-primary btn-panel" onclick="TakePhoto()">Photo</div>
                     <div class="btn btn-panel" onclick="Right()">Right</div>
                 </div>
                 <div class="content content-rows content-rows-1">
@@ -93,54 +113,27 @@
                 </div>
             </div>
 {{/*            <div class="content content-col content-col-1">*/}}
-
                   <div class="photo">
-                      <div class="centered">Last photo</div>
-                      <img  src="/private/static/img/img_1.png" alt="name" >
+                      <div id="last-photo-name" class="centered">Press <b>Photo</b></div>
+                      <img id="last-photo-img" src="/private/static/img/img_1.png" alt="name" style="border-radius: 4px">
                   </div>
 {{/*                </div>*/}}
 
         </div>
         <div id="album" class="content content-rows content-rows-3">
+
+            {{ range .}}
             <div class=" centered photo-box content-col">
                 <div class="photo">
-                    <img src="/private/static/img/img_1.png" alt="name">
+                    <img src="/private/static/img/{{.Name}}" alt="{{.Name}}">
                 </div>
-                <div class="centered photo-info"><p>info</p></div>
+                <div class="centered photo-info"><p>Size: {{.Size}}B ID: {{.Id}}</p></div>
                 <div class="photo-box-buttons content content-rows content-rows-2">
-                    <div class="btn">Download</div>
-                    <div class="btn btn-secondary">Delete</div>
+                    <a href="/private/static/img/{{.Name}}" download class="btn">Download</a>
+                    <p class="btn btn-secondary">Delete</p>
                 </div>
             </div>
-            <div class="centered photo-box content-col">
-                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%"
-                                        height="100%">
-                </div>
-                <div>info</div>
-                <div class="content content-rows content-rows-2">
-                    <div class="btn">Download</div>
-                    <div class="btn btn-secondary">Delete</div>
-                </div>
-            </div>
-            <div class="centered photo-box content-col">
-                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%" height="100%">
-                </div>
-                <div>info</div>
-                <div class="content content-rows content-rows-2">
-                    <div class="btn">Download</div>
-                    <div class="btn btn-secondary">Delete</div>
-                </div>
-            </div>
-            <div class="centered photo-box content-col">
-                <div class="photo"><img src="/private/static/img/img_1.png" alt="namee" width="100%" height="100%">
-                </div>
-                <div>info</div>
-                <div class="content content-rows content-rows-2">
-                    <div class="btn">Download</div>
-                    <div class="btn btn-secondary">Delete</div>
-                </div>
-            </div>
-            <div class="photo-box"> Альбом</div>
+            {{end}}
             {{/*    <div class="container">*/}}
         </div>
 
