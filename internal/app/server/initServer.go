@@ -1,14 +1,12 @@
 package server
 
 import (
-	"github.com/japersik/go-rpi-cam-control/internal/app/cameraController"
-	"github.com/japersik/go-rpi-cam-control/internal/app/moveController"
+	"github.com/japersik/go-rpi-cam-control/internal/app/service"
 	"net/http"
 )
 
-func Start(config *Config, mover moveController.Mover, camera cameraController.Camera) error {
+func Start(config *Config, service service.Service) error {
 
-	s := newServer(config, mover, camera)
-	s.configureLogger(config.LogLevel)
+	s := newServer(config, service)
 	return http.ListenAndServe(config.BindAddr, s)
 }

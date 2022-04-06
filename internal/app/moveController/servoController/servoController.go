@@ -1,29 +1,8 @@
-package ServoController
+package servoController
 
 import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
-
-//func main() {
-//
-//
-//
-//	pin := rpio.Pin(13)
-//	pin.Mode(rpio.Pwm)
-//	pin.Freq(5000)
-//	pin.DutyCycleWithPwmMode(0, 200, rpio.MarkSpace)
-//	// the LED will be blinking at 2000Hz
-//	// (source frequency divided by cycle length => 64000/32 = 2000)
-//
-//	// five times smoothly fade in and out
-//	for i := 5; i < 100; i+=5 {
-//		fmt.Println(i)
-//		pin.DutyCycleWithPwmMode(uint32(i),200, rpio.MarkSpace)
-//		time.Sleep(time.Second)
-//	}
-//
-//	pin.DutyCycleWithPwmMode(0, 200, rpio.Balanced)
-//}
 
 type GPIOServoController struct {
 	servoX *sg90

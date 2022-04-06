@@ -1,11 +1,16 @@
-bing_addr = ":8080"
-log_level = "debug"
-auth_file = "users.json"
-session_key = "[session_key]"
-new_user_key = "[new_user_key]"
+[server_config]
+    bind_addr = ":8080"
+    log_level = "debug"
+    session_key = "[session_key]"
 
+[camera_config]
 
-gpio_x = 12
-gpio_y = 19
-inverse_x = true
-inverse_y = false
+[servo_config]
+    gpio_x = 12
+    gpio_y = 19
+    inverse_x = true
+    inverse_y = false
+
+[user_store]
+    auth_file = "users.json"
+    new_user_key = "1"

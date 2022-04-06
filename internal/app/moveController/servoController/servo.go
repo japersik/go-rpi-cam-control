@@ -1,4 +1,4 @@
-package ServoController
+package servoController
 
 import (
 	"github.com/stianeikeland/go-rpio/v4"

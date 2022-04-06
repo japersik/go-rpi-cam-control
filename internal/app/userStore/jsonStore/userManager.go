@@ -1,4 +1,4 @@
-package server
+package jsonStore
 
 import (
 	"encoding/json"
@@ -9,39 +9,39 @@ import (
 	"os"
 )
 
-func newUserStore(userFile, passcode string) userStore {
+func NewUserStore(config *Config) *UserStore {
 	users := map[string][]byte{}
-	jsonFile, err := os.OpenFile(userFile, os.O_RDWR|os.O_CREATE, 0666)
+	jsonFile, err := os.OpenFile(config.AuthFile, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		fmt.Println("Open userFile error")
 	}
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	err = json.Unmarshal(byteValue, &users)
-	return userStore{
-		userFile:     userFile,
+	return &UserStore{
+		userFile:     config.AuthFile,
 		userPassword: users,
-		passcode:     passcode,
+		passcode:     config.NewUserKey,
 	}
 }
 
-type userStore struct {
+type UserStore struct {
 	userFile     string
 	userPassword map[string][]byte
 	passcode     string
 }
 
-func (u userStore) checkUserExist(username string) bool {
+func (u UserStore) CheckUserExist(username string) bool {
 	_, ok := u.userPassword[username]
 	return ok
 }
 
-func (u *userStore) CreateUser(username, password string, passcode string) error {
+func (u *UserStore) CreateUser(username, password string, passcode string) error {
 	fmt.Println(passcode, u.passcode)
 	if u.passcode != passcode {
 		return errors.New("Wrong passcode")
 	}
-	if u.checkUserExist(username) {
+	if u.CheckUserExist(username) {
 		return errors.New("User exists")
 	}
 	if len(password) < 6 {
@@ -56,8 +56,8 @@ func (u *userStore) CreateUser(username, password string, passcode string) error
 	return nil
 }
 
-func (u *userStore) CheckUser(username, password string) bool {
-	if !u.checkUserExist(username) {
+func (u *UserStore) CheckUser(username, password string) bool {
+	if !u.CheckUserExist(username) {
 		return false
 	}
 	chash := u.userPassword[username]
@@ -67,11 +67,13 @@ func (u *userStore) CheckUser(username, password string) bool {
 	}
 	return true
 }
+
 func getHashingCost(hashedPassword []byte) int {
 	cost, _ := bcrypt.Cost(hashedPassword) // Игнорировать обработку ошибок для простоты
 	return cost
 }
-func (u userStore) save() error {
+
+func (u UserStore) save() error {
 	jsonFile, err := os.OpenFile(u.userFile, os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err

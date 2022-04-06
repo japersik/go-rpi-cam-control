@@ -4,13 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/japersik/go-rpi-cam-control/internal/app/cameraController"
-	"github.com/japersik/go-rpi-cam-control/internal/app/moveController"
+	"github.com/japersik/go-rpi-cam-control/internal/app/service"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"net/http"
@@ -23,9 +21,7 @@ type server struct {
 	logger       *zap.Logger
 	atom         zap.AtomicLevel
 	sessionStore sessions.Store
-	mover        moveController.Mover
-	camera       cameraController.Camera
-	userStore    userStore
+	service      service.Service
 }
 
 const (
@@ -39,20 +35,19 @@ var (
 	sessionName         = "SessionCookie"
 )
 
-func newServer(config *Config, mover moveController.Mover, camera cameraController.Camera) *server {
+func newServer(config *Config, service service.Service) *server {
 	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
 	s := &server{
 		router:       mux.NewRouter(),
 		atom:         zap.NewAtomicLevel(),
 		sessionStore: sessionStore,
-		mover:        mover,
-		camera:       camera,
-		userStore:    newUserStore(config.AuthFile, config.NewUserKey),
+		service:      service,
 	}
 	s.configureRouter()
 	encoderCfg := zap.NewProductionEncoderConfig()
 	encoderCfg.TimeKey = ""
 	s.logger = zap.New(zapcore.NewCore(zapcore.NewJSONEncoder(encoderCfg), zapcore.Lock(os.Stdout), s.atom))
+	s.configureLogger(config.LogLevel)
 	return s
 }
 
@@ -122,167 +117,6 @@ func (s *server) logRequest(next http.Handler) http.Handler {
 			zap.String("Status:", http.StatusText(myWriter.code)),
 		)
 	})
-}
-
-//authenticateUser аутентификация пользователя
-func (s *server) authenticateUser(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		session, err := s.sessionStore.Get(r, sessionName)
-		if err != nil {
-			//fmt.Println(err)
-			s.error(w, r, http.StatusInternalServerError, err)
-			//http.Redirect(w, r, "/", http.StatusPermanentRedirect)
-			return
-		}
-		uname, ok := session.Values["user_name"]
-		if !ok {
-			//fmt.Println(12311111123123)
-			//session.Options.MaxAge = 3
-			//err = s.sessionStore.Save(r, w, session)
-			//s.error(w, r, http.StatusUnauthorized, errNotAuthenticated)
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-			return
-		}
-		if !s.userStore.checkUserExist(uname.(string)) {
-			//s.error(w, r, http.StatusUnauthorized, errNotAuthenticated)
-			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-			return
-		}
-
-		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKeyUser, uname)))
-		//next.ServeHTTP(w, r)
-	})
-}
-
-//handleCreateUser создаёт пользователя и в случае успеха переадресовывает на авторизацию
-func (s *server) handleCreateUser() http.HandlerFunc {
-	type request struct {
-		UserCreationCodeWord string `json:"code_word"`
-		Name                 string `json:"name"`
-		Password             string `json:"password"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		if s.userStore.checkUserExist(req.Name) {
-			s.error(w, r, http.StatusUnprocessableEntity, errors.New("user exist or wrong passcode"))
-			return
-		}
-		err := s.userStore.CreateUser(req.Name, req.Password, req.UserCreationCodeWord)
-		if err != nil {
-			s.error(w, r, http.StatusUnprocessableEntity, errors.New("user exist or wrong passcode"))
-			return
-		}
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		//http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	}
-}
-
-//handleMakeSession авторизовывает пользователя и устанавливает сессию
-func (s *server) handleMakeSession() http.HandlerFunc {
-	type request struct {
-		Name     string `json:"name"`
-		Password string `json:"password"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-
-		if !s.userStore.CheckUser(req.Name, req.Password) {
-			s.error(w, r, http.StatusUnauthorized, errEmailOrPassword)
-			return
-		} else {
-			session, err := s.sessionStore.Get(r, sessionName)
-			if err != nil {
-				s.error(w, r, http.StatusInternalServerError, err)
-			}
-			session.Values["user_name"] = req.Name
-			session.Options.MaxAge = int(time.Hour.Seconds())
-			err = s.sessionStore.Save(r, w, session)
-			if err != nil {
-				s.error(w, r, http.StatusInternalServerError, err)
-			}
-		}
-		//http.Redirect(w, r, "/", http.StatusPermanentRedirect)
-		s.respond(w, r, http.StatusOK, "That Fits")
-	}
-}
-
-//logoutUser сброс авторизации пользователя
-func (s *server) logoutUser() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		session, err := s.sessionStore.Get(r, sessionName)
-		if err != nil {
-			s.error(w, r, http.StatusInternalServerError, err)
-			return
-		}
-		_, ok := session.Values["user_name"]
-		if ok {
-			session.Options.MaxAge = -1
-			err = s.sessionStore.Save(r, w, session)
-			if err != nil {
-				s.error(w, r, http.StatusInternalServerError, err)
-			}
-		}
-		s.respond(w, r, http.StatusNonAuthoritativeInfo, "Log out")
-	}
-}
-
-func (s *server) cameraControl() http.HandlerFunc {
-	type request struct {
-		CommandName string `json:"command_name"`
-		id          int    `json:"id"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		switch req.CommandName {
-		case "take_photo":
-			ph, _ := s.camera.TakePhoto()
-			s.respond(w, r, http.StatusOK, ph)
-			return
-		case "del_photo":
-			s.camera.DelPhoto(req.id)
-		case "get_photo":
-			ph, _ := s.camera.GetPhoto(req.id)
-			s.respond(w, r, http.StatusOK, ph)
-			return
-		}
-
-		s.respond(w, r, http.StatusOK, "Ok")
-	}
-}
-
-//moveControl
-func (s *server) moveControl() http.HandlerFunc {
-	type request struct {
-		Direction string `json:"direction"`
-		Value     int    `json:"value"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		req := &request{}
-		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
-		fmt.Println(req)
-		switch req.Direction {
-		case "x":
-			s.mover.MoveX(req.Value)
-		case "y":
-			s.mover.MoveY(req.Value)
-		}
-		s.respond(w, r, http.StatusOK, "Ok")
-	}
 }
 
 //error возвращает в http.Request ошибку с заданным кодом
