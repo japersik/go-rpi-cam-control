@@ -132,6 +132,7 @@ func (s *server) cameraControl() http.HandlerFunc {
 			s.respond(w, r, http.StatusOK, ph)
 		case "del_photo":
 			s.service.DelPhoto(req.Id)
+			s.respond(w, r, http.StatusOK, "ok")
 		case "get_photo":
 			ph, _ := s.service.GetPhoto(req.Id)
 			s.respond(w, r, http.StatusOK, ph)
