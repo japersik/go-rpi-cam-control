@@ -135,10 +135,10 @@ func (s *server) cameraControl() http.HandlerFunc {
 		case "get_photo":
 			ph, _ := s.service.GetPhoto(req.Id)
 			s.respond(w, r, http.StatusOK, ph)
-			return
+		default:
+			s.respond(w, r, http.StatusBadRequest, "wrong command_name")
 		}
 
-		s.respond(w, r, http.StatusOK, "Ok")
 	}
 }
 
