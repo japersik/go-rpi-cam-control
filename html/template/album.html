@@ -4,7 +4,7 @@
     {{ template "header"}}
     <script>
         function Up() {
-            var obj = {};
+            let obj = {};
             obj.direction = 'y'
             obj.value = 3
             $.ajax({
@@ -22,7 +22,7 @@
             })
         }
         function Down() {
-            var obj = {};
+            let obj = {};
             obj.direction = 'y'
             obj.value = -3
             $.ajax({
@@ -40,7 +40,7 @@
             })
         }
         function Left() {
-            var obj = {};
+            let obj = {};
             obj.direction = 'x'
             obj.value = -3
             $.ajax({
@@ -58,7 +58,7 @@
             })
         }
         function Right() {
-            var obj = {};
+            let obj = {};
             obj.direction = 'x'
             obj.value = 3
             $.ajax({
@@ -76,7 +76,7 @@
             })
         }
         function TakePhoto() {
-            var obj = {};
+            let obj = {};
             obj.command_name = 'take_photo'
             $.ajax({
                 url: '/private/camera_control',
@@ -89,11 +89,37 @@
                     document.querySelector("#last-photo-name").innerHTML = '<b>Last photo</b>: ' +response['name']
                     document.querySelector("#last-photo-img").setAttribute('src','/private/static/img/' +response['name'])
                 },
-                error: function(xhr, resp, text) {
+                error: function() {
                     document.querySelector("#last-photo-name").innerHTML = 'Last photo getting <b>error<b>'
                     document.querySelector("#last-photo-img").setAttribute('src','/private/static/img/img_1.png')
                 }
             })
+        }
+        function DelPhoto(val) {
+            let obj = {};
+            obj.command_name = 'del_photo'
+            obj.id = val
+            $.ajax({
+                url: '/private/camera_control',
+                type : "post",
+                contentType: "application/json",
+                dataType : 'json',
+                data : JSON.stringify(obj),
+                success : function(response) {
+                    console.log(response)
+                    document.querySelector("#photo_"+val).remove()
+                },
+                error: function() {
+                    document.querySelector("#rm_button_"+val).setAttribute("style","background:red")
+                }
+            })
+        }
+        function AddPage(value) {
+            const path = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+            const next = Number(path) + value;
+            if (next>0){
+            location.href = next
+            }
         }
     </script>
     <div class="centered content content-col content-col-1" id="content">
@@ -120,17 +146,21 @@
 {{/*                </div>*/}}
 
         </div>
+        <div class="content content-rows content-rows-2" id="page-buttons">
+            <div class="btn" onclick="AddPage(-1)">Previous page</div>
+            <div class="btn" onclick="AddPage(1)">Next Page</div>
+        </div>
         <div id="album" class="content content-rows content-rows-3">
 
             {{ range .}}
-            <div class=" centered photo-box content-col">
+            <div class=" centered photo-box content-col" id="photo_{{.Id}}">
                 <div class="photo">
                     <img src="/private/static/img/{{.Name}}" alt="{{.Name}}">
                 </div>
                 <div class="centered photo-info"><p>Size: {{.Size}}B ID: {{.Id}}</p></div>
                 <div class="photo-box-buttons content content-rows content-rows-2">
                     <a href="/private/static/img/{{.Name}}" download class="btn">Download</a>
-                    <p class="btn btn-secondary">Delete</p>
+                    <p class="btn btn-secondary" id="rm_button_{{.Id}}" onclick="DelPhoto({{.Id}})">Delete</p>
                 </div>
             </div>
             {{end}}

@@ -18,7 +18,7 @@ type rpiCam struct {
 }
 
 func NewRpiCam(conf *Config) *rpiCam {
-	path := "private/static/img"
+	path := "private/static/img/"
 	var phArr []cameraController.PhotoInfo
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
@@ -27,7 +27,7 @@ func NewRpiCam(conf *Config) *rpiCam {
 	if files != nil {
 		phArr = make([]cameraController.PhotoInfo, 0, len(files))
 		for i := 0; i < len(files); i++ {
-			if strings.HasSuffix(files[i].Name(), ".jpeg") {
+			if strings.HasSuffix(files[i].Name(), ".jpeg") || strings.HasSuffix(files[i].Name(), ".png") {
 				phArr = append(phArr, cameraController.PhotoInfo{Name: files[i].Name(), Size: files[i].Size(), CreationTime: files[i].ModTime()})
 			}
 		}
@@ -43,8 +43,8 @@ func NewRpiCam(conf *Config) *rpiCam {
 
 func (r *rpiCam) TakePhoto() (cameraController.PhotoInfo, error) {
 	t := time.Now()
-	name := r.photoDir + t.Format("/2006-01-02-150405") + strconv.Itoa(len(r.photos)+1) + ".jpeg"
-	_, err := cmdGetPhoto(name)
+	name := r.photoDir + t.Format("2006-01-02-150405") + strconv.Itoa(len(r.photos)+1) + ".jpeg"
+	_, err := cmdTakePhoto(name)
 	if err != nil {
 		return cameraController.PhotoInfo{}, err
 	}
@@ -57,17 +57,29 @@ func (r *rpiCam) TakePhoto() (cameraController.PhotoInfo, error) {
 	return r.photos[len(r.photos)-1], nil
 }
 func (r *rpiCam) DelPhoto(id int) (err error) {
-	fmt.Println("delPhoto", id)
+	for i := 0; i < len(r.photos); i++ {
+		fmt.Printf("%d-", i)
+		if r.photos[i].Id == id {
+
+			fmt.Println(r.photoDir + r.photos[i].Name)
+			err := os.Remove(r.photoDir + r.photos[i].Name)
+			if err != nil {
+				return err
+			}
+			r.photos = append(r.photos[0:i], r.photos[i+1:len(r.photos)]...)
+			return nil
+		}
+	}
 	return nil
 }
 func (r *rpiCam) GetPhoto(id int) (cameraController.PhotoInfo, error) {
-	if len(r.photos) < id {
+	if len(r.photos) > id {
 		return r.photos[id], nil
 	}
 	return cameraController.PhotoInfo{}, errors.New("id not found")
 }
 
-func cmdGetPhoto(name string) ([]byte, error) {
+func cmdTakePhoto(name string) ([]byte, error) {
 	app := "raspistill"
 
 	arg0 := "-o"
@@ -82,6 +94,7 @@ func cmdGetPhoto(name string) ([]byte, error) {
 func (r *rpiCam) GetPhotoNums() int {
 	return len(r.photos) - 1
 }
+
 func (r *rpiCam) GetPhotoNames(count, pageNumber int) ([]cameraController.PhotoInfo, error) {
 	if count*(pageNumber-1) > r.GetPhotoNums() {
 		return nil, errors.New("Maximum page: " + strconv.Itoa(r.GetPhotoNums()))

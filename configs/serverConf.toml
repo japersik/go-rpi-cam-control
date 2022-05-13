@@ -13,4 +13,4 @@
 
 [user_store]
     auth_file = "users.json"
-    new_user_key = "1"
+    new_user_key = "[new_user_key]"

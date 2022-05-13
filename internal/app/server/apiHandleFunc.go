@@ -118,7 +118,7 @@ func (s *server) logoutUser() http.HandlerFunc {
 func (s *server) cameraControl() http.HandlerFunc {
 	type request struct {
 		CommandName string `json:"command_name"`
-		id          int    `json:"id"`
+		Id          int    `json:"id"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		req := &request{}
@@ -130,11 +130,10 @@ func (s *server) cameraControl() http.HandlerFunc {
 		case "take_photo":
 			ph, _ := s.service.TakePhoto()
 			s.respond(w, r, http.StatusOK, ph)
-			return
 		case "del_photo":
-			s.service.DelPhoto(req.id)
+			s.service.DelPhoto(req.Id)
 		case "get_photo":
-			ph, _ := s.service.GetPhoto(req.id)
+			ph, _ := s.service.GetPhoto(req.Id)
 			s.respond(w, r, http.StatusOK, ph)
 			return
 		}
